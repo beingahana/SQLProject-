@@ -1,0 +1,71 @@
+USE RapidoDataProject;
+GO
+
+CREATE TABLE Rides (
+    ride_id VARCHAR(50) PRIMARY KEY,
+    services VARCHAR(50),
+    ride_date DATE,
+    ride_time TIME,
+    ride_status VARCHAR(50),
+    source VARCHAR(100),
+    destination VARCHAR(100),
+    duration INT,  
+    distance FLOAT,
+    ride_charge FLOAT,
+    misc_charge FLOAT,
+    total_fare FLOAT,
+    payment_method VARCHAR(50)
+);
+
+// 1.Total Number of Rides and Completion Rate
+SELECT
+    COUNT(*) AS total_rides,
+    SUM(CASE WHEN ride_status = 'Completed' THEN 1 ELSE 0 END) AS completed_rides,
+    ROUND(100.0 * SUM(CASE WHEN ride_status = 'Completed' THEN 1 ELSE 0 END) / COUNT(*), 2) AS completion_rate_pct
+FROM Rides;
+
+// 2.Daily Ride Trends
+SELECT
+    ride_date,
+    COUNT(*) AS total_rides,
+    SUM(CASE WHEN ride_status = 'Completed' THEN 1 ELSE 0 END) AS completed_rides
+FROM Rides
+GROUP BY ride_date
+ORDER BY ride_date;
+
+//3.Most Common Ride Sources & Destinations
+>>Top 5 Destinations
+SELECT TOP 5 source, COUNT(*) AS ride_count
+FROM Rides
+GROUP BY source
+ORDER BY ride_count DESC;
+
+
+>>Top 5 Destinations
+SELECT TOP 5 destination, COUNT(*) AS ride_count
+FROM Rides
+GROUP BY destination
+ORDER BY ride_count DESC;
+
+//4. Galti sudhara
+ALTER TABLE Rides
+ALTER COLUMN ride_charge FLOAT;
+
+ALTER TABLE Rides
+ALTER COLUMN misc_charge FLOAT;
+
+ALTER TABLE Rides
+ALTER COLUMN total_fare FLOAT;
+
+
+//5.Revenue Insights
+SELECT
+    ROUND(SUM(ride_charge),2) AS total_ride_charge,
+    ROUND(SUM(misc_charge),2) AS total_misc_charge,
+    ROUND(SUM(total_fare),2) AS total_revenue
+FROM Rides
+WHERE ride_status = 'Completed';
+
+
+
+
